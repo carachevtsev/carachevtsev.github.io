@@ -87,7 +87,28 @@ function startWebRTC(isOfferer) {
     }
     dataChannel = pc.createDataChannel('chat');
     setupDataChannel();
-  } else {
+  } 
+  
+  // When a remote stream arrives display it in the #remoteVideo element
+  pc.ontrack = event => {
+    const stream = event.streams[0];
+    if (!remoteVideo.srcObject || remoteVideo.srcObject.id !== stream.id) {
+      remoteVideo.srcObject = stream;
+    }
+  };
+
+  navigator.mediaDevices.getUserMedia({
+    audio: true,
+    video: true,
+  }).then(stream => {
+    // Display your local video in #localVideo element
+    localVideo.srcObject = stream;
+    // Add your stream to be sent to the conneting peer
+    stream.getTracks().forEach(track => pc.addTrack(track, stream));
+  }, onError);
+
+  
+  else {
     // If user is not the offerer let wait for a data channel
     pc.ondatachannel = event => {
       dataChannel = event.channel;
