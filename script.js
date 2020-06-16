@@ -87,7 +87,13 @@ function startWebRTC(isOfferer) {
     }
     dataChannel = pc.createDataChannel('chat');
     setupDataChannel();
-  } 
+  } else {
+    // If user is not the offerer let wait for a data channel
+    pc.ondatachannel = event => {
+      dataChannel = event.channel;
+      setupDataChannel();
+    }
+  }
   
   // When a remote stream arrives display it in the #remoteVideo element
   pc.ontrack = event => {
@@ -107,20 +113,6 @@ function startWebRTC(isOfferer) {
     stream.getTracks().forEach(track => pc.addTrack(track, stream));
   }, onError);
 
-  
-  else {
-    // If user is not the offerer let wait for a data channel
-    pc.ondatachannel = event => {
-      dataChannel = event.channel;
-      setupDataChannel();
-    }
-  }
-
-  startListentingToSignals();
-}
-
-function startListentingToSignals() {
-  // Listen to signaling data from Scaledrone
   room.on('data', (message, client) => {
     // Message was sent by us
     if (client.id === drone.clientId) {
