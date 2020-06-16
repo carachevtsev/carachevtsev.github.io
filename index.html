@@ -7,12 +7,12 @@
   <style>
     body {
       display: flex;
+      height: 100vh;
+      margin: 0;
       align-items: center;
       justify-content: center;
-      margin: 0;
+      padding: 0 50px;
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      font-size: 16px;
-      height: 100vh;
     }
     video {
       max-width: calc(50% - 100px);
@@ -93,6 +93,10 @@
   </style>
 </head>
 <body>
+    <div class="copy">Send your URL to a friend to start a video call</div>
+  <video id="localVideo" autoplay muted></video>
+  <video id="remoteVideo" autoplay></video>
+  
   <div class="content">
     <div class="messages">
 
@@ -110,9 +114,6 @@
     </div>
   </template>
 
-  <div class="copy">Send your URL to a friend to start a video call</div>
-  <video id="localVideo" autoplay muted></video>
-  <video id="remoteVideo" autoplay></video>
   
   <script src="script.js"></script>
 
