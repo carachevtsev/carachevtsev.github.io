@@ -95,10 +95,7 @@ function startWebRTC(isOfferer) {
     }
   }
 
-  startListentingToSignals();
-}
-
-function startListentingToSignals() {
+  function startListentingToSignals() {
   // Listen to signaling data from Scaledrone
   pc.ontrack = event => {
     const stream = event.streams[0];
@@ -116,6 +113,11 @@ function startListentingToSignals() {
     // Add your stream to be sent to the conneting peer
     stream.getTracks().forEach(track => pc.addTrack(track, stream));
   }, onError);
+  
+  startListentingToSignals();
+}
+
+
   room.on('data', (message, client) => {
     // Message was sent by us
     if (client.id === drone.clientId) {
