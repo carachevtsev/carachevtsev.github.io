@@ -99,9 +99,6 @@ function startWebRTC(isOfferer) {
  
 function checkDataChannelState() {
   console.log('WebRTC channel state is:', dataChannel.readyState);
-if (dataChannel.readyState === 'open') {
-insertMessageToDOM({});
- }
 }
   
   // When a remote stream arrives display it in the #remoteVideo element
