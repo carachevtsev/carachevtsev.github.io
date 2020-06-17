@@ -10,7 +10,7 @@ function randomEmoji() {
 }
 const emoji = randomEmoji();
 
-const name = prompt("What is your nickname?");
+const name = prompt("Введите свое имя");
 // Generate random room name if needed
 if (!location.hash) {
   location.hash = Math.floor(Math.random() * 0xFFFFFF).toString(16);
