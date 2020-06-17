@@ -1,3 +1,15 @@
+const possibleEmojis = [
+  '🐀','🐁','🐭','🐹','🐂','🐃','🐄','🐮','🐅','🐆','🐯','🐇','🐐','🐑','🐏','🐴',
+  '🐎','🐱','🐈','🐰','🐓','🐔','🐤','🐣','🐥','🐦','🐧','🐘','🐩','🐕','🐷','🐖',
+  '🐗','🐫','🐪','🐶','🐺','🐻','🐨','🐼','🐵','🙈','🙉','🙊','🐒','🐉','🐲','🐊',
+  '🐍','🐢','🐸','🐋','🐳','🐬','🐙','🐟','🐠','🐡','🐚','🐌','🐛','🐜','🐝','🐞',
+];
+function randomEmoji() {
+  const randomIndex = Math.floor(Math.random() * possibleEmojis.length);
+  return possibleEmojis[randomIndex];
+}
+const emoji = randomEmoji();
+
 const name = prompt("What's your name?");
 // Generate random room name if needed
 if (!location.hash) {
