@@ -22,7 +22,7 @@ const drone = new ScaleDrone('b4hwSfoKT8CniGIh');
 const roomName = 'observable-' + roomHash;
 const configuration = {
   iceServers: [{
-    urls: 'stun:stun.sipnet.ru:3478'
+    urls: 'stun:stun1.l.google.com:19302'
   }]
 };
 let room;
