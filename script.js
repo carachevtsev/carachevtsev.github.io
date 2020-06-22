@@ -1,25 +1,29 @@
+//смайлики для аватаров
 const possibleEmojis = [
   '🐀','🐁','🐭','🐹','🐂','🐃','🐄','🐮','🐅','🐆','🐯','🐇','🐐','🐑','🐏','🐴',
   '🐎','🐱','🐈','🐰','🐓','🐔','🐤','🐣','🐥','🐦','🐧','🐘','🐩','🐕','🐷','🐖',
   '🐗','🐫','🐪','🐶','🐺','🐻','🐨','🐼','🐵','🙈','🙉','🙊','🐒','🐉','🐲','🐊',
   '🐍','🐢','🐸','🐋','🐳','🐬','🐙','🐟','🐠','🐡','🐚','🐌','🐛','🐜','🐝','🐞',
 ];
+//функция для рандомного выбора смайлика
 function randomEmoji() {
   const randomIndex = Math.floor(Math.random() * possibleEmojis.length);
   return possibleEmojis[randomIndex];
 }
 const emoji = randomEmoji();
-
+//Переменная с именем пользователя для текстового чата
 const name = prompt("Введите свое имя");
-// Generate random room name if needed
+
 if (!location.hash) {
   location.hash = Math.floor(Math.random() * 0xFFFFFF).toString(16);
 }
+//Генерация хеш-данных для создания уникального URL-адреса
 const roomHash = location.hash.substring(1);
-
+//Данные, для подключения к связующему серверу
 const drone = new ScaleDrone('b4hwSfoKT8CniGIh');
-// Room name needs to be prefixed with 'observable-'
+//Присвоение комнате рандомного имени
 const roomName = 'observable-' + roomHash;
+//Публичный STUN-сервер
 const configuration = {
   iceServers: [{
     urls: 'stun:stun1.l.google.com:19302'
@@ -34,7 +38,7 @@ function onSuccess() {};
 function onError(error) {
   console.error(error);
 };
-
+//подключение к Scaledrone
 drone.on('open', error => {
   if (error) {
     return console.error(error);
@@ -45,17 +49,16 @@ drone.on('open', error => {
       onError(error);
     }
   });
-  // We're connected to the room and received an array of 'members'
-  // connected to the room (including us). Signaling server is ready.
+  // Кто подключен к комнате, включая нас
   room.on('members', members => {
     console.log('MEMBERS', members);
-    // If we are the second user to connect to the room we will be creating the offer
+    // Если мы второй пользователь, то создается Offer
     const isOfferer = members.length === 2;
     startWebRTC(isOfferer);
   });
 });
 
-// Send signaling data via Scaledrone
+// Отправляет сигнальные данные черзе Scaledrone
 function sendMessage(message) {
   drone.publish({
     room: roomName,
@@ -66,15 +69,14 @@ function sendMessage(message) {
 function startWebRTC(isOfferer) {
   pc = new RTCPeerConnection(configuration);
 
-  // 'onicecandidate' notifies us whenever an ICE agent needs to deliver a
-  // message to the other peer through the signaling server
+  // 'onicecandidate' уведомляет нас всякий раз, когда ICE-agent должен доставить
+  // сообщение другому узлу через сервер сигнализации
   pc.onicecandidate = event => {
     if (event.candidate) {
       sendMessage({'candidate': event.candidate});
     }
   };
 
-  // If user is offerer let the 'negotiationneeded' event create the offer
   if (isOfferer) {
     pc.onnegotiationneeded = () => {
       pc.createOffer().then(localDescCreated).catch(onError);
@@ -82,7 +84,6 @@ function startWebRTC(isOfferer) {
     dataChannel = pc.createDataChannel('chat');
     setupDataChannel();
   } else {
-    // If user is not the offerer let wait for a data channel
     pc.ondatachannel = event => {
       dataChannel = event.channel;
       setupDataChannel();
@@ -101,7 +102,7 @@ function checkDataChannelState() {
   console.log('WebRTC channel state is:', dataChannel.readyState);
 }
   
-  // When a remote stream arrives display it in the #remoteVideo element
+  // Когда удаленный поток прибыл, его нужно отобразить в  элементе remoteVideo
   pc.ontrack = event => {
     const stream = event.streams[0];
     if (!remoteVideo.srcObject || remoteVideo.srcObject.id !== stream.id) {
@@ -113,31 +114,28 @@ function checkDataChannelState() {
     audio: true,
     video: true,
   }).then(stream => {
-    // Display your local video in #localVideo element
+    // Отобразить ваш локальный видеопоток в элемент localVideo
     localVideo.srcObject = stream;
-    // Add your stream to be sent to the conneting peer
+    // Отпрвление вашего потока в соединительный узел
     stream.getTracks().forEach(track => pc.addTrack(track, stream));
   }, onError);
 
-  // Listen to signaling data from Scaledrone
+  // Получение сигнальных сообщений из Scaledrone
   room.on('data', (message, client) => {
-    // Message was sent by us
+    // Сообщение было отправленно..
     if (client.id === drone.clientId) {
       return;
     }
 
     if (message.sdp) {
-      // This is called after receiving an offer or answer from another peer
       pc.setRemoteDescription(new RTCSessionDescription(message.sdp), () => {
         console.log('pc.remoteDescription.type', pc.remoteDescription.type);
-        // When receiving an offer lets answer it
         if (pc.remoteDescription.type === 'offer') {
           console.log('Answering offer');
           pc.createAnswer(localDescCreated, error => console.error(error));
         }
       }, error => console.error(error));
     } else if (message.candidate) {
-      // Add the new ICE candidate to our connections remote description
       pc.addIceCandidate(new RTCIceCandidate(message.candidate));
     }
   });
@@ -169,7 +167,6 @@ function insertMessageToDOM(options, isFromMe) {
   const messagesEl = document.querySelector('.messages');
   messagesEl.appendChild(clone);
  
-  // Scroll to bottom
   messagesEl.scrollTop = messagesEl.scrollHeight - messagesEl.clientHeight;
 }
 
